@@ -12,9 +12,6 @@ import wandb
 import torchvision.models as tv_models
 import json
 
-################################################################################
-# Model Definition (Simple Example - You need to complete)
-# For Part 2 you have the option of using a predefined network and
 def set_seed(seed=42):
 	torch.manual_seed(seed)
 	np.random.seed(seed)
