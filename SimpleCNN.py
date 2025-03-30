@@ -11,13 +11,6 @@ from tqdm.auto import tqdm  # For progress bars
 import wandb
 import json
 
-################################################################################
-# Model Definition (Simple Example - You need to complete)
-# For Part 1, you need to manually define a network.
-# For Part 2 you have the option of using a predefined network and
-# for Part 3 you have the option of using a predefined, pretrained network to
-# finetune.
-################################################################################
 class SimpleCNN(nn.Module):
     def __init__(self):
         super(SimpleCNN, self).__init__()
@@ -60,9 +53,6 @@ class SimpleCNN(nn.Module):
         x=self.fc2(x)
         return x
 
-################################################################################
-# Define a one epoch training function
-################################################################################
 def train(epoch, model, trainloader, optimizer, criterion, CONFIG):
     """Train one epoch, e.g. all batches of one epoch."""
     device = CONFIG["device"]
@@ -100,9 +90,6 @@ def train(epoch, model, trainloader, optimizer, criterion, CONFIG):
     return train_loss, train_acc
 
 
-################################################################################
-# Define a validation function
-################################################################################
 def validate(model, valloader, criterion, device):
     """Validate the model"""
     model.eval() # Set to evaluation
@@ -138,23 +125,14 @@ def validate(model, valloader, criterion, device):
 
 
 def main():
-
-    ############################################################################
-    #    Configuration Dictionary (Modify as needed)
-    ############################################################################
-    # It's convenient to put all the configuration in a dictionary so that we have
-    # one place to change the configuration.
-    # It's also convenient to pass to our experiment tracking tool.
-
-
     CONFIG = {
-        "model": "SimpleCNN_1",   # Change name when using a different model
-        "batch_size": 128, # run batch size finder to find optimal batch size
+        "model": "SimpleCNN_1",   
+        "batch_size": 128, 
         "learning_rate": 1e-3,
         "epochs":5,
-        "num_workers": 2, # Adjust based on your system
+        "num_workers": 2, 
         "device": "mps" if torch.backends.mps.is_available() else "cuda" if torch.cuda.is_available() else "cpu",
-        "data_dir": "./data",  # Make sure this directory exists
+        "data_dir": "./data",  
         "ood_dir": "./data/ood-test",
         "wandb_project": "sp25-ds542-challenge",
         "seed": 42,
@@ -164,10 +142,6 @@ def main():
     print("\nCONFIG Dictionary:")
     pprint.pprint(CONFIG)
 
-    ############################################################################
-    #      Data Transformation (Example - You might want to modify) 
-    ############################################################################
-
     transform_train = transforms.Compose([
     transforms.RandomHorizontalFlip(),
     transforms.RandomCrop(32, padding=4),
@@ -176,20 +150,13 @@ def main():
     transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
 ])
 
-    ###############
-    # TODO Add validation and test transforms - NO augmentation for validation/test
-    ###############
-
     # Validation and test transforms (NO augmentation)
     transform_test = transforms.Compose([
         transforms.ToTensor(),
         transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
     ])   ### TODO -- BEGIN SOLUTION
 
-    ############################################################################
-    #       Data Loading
-    ############################################################################
-
+    
     trainset = torchvision.datasets.CIFAR100(root='./data', train=True,
                                             download=True, transform=transform_train)
 
@@ -206,18 +173,12 @@ def main():
     testset = torchvision.datasets.CIFAR100(root=CONFIG["data_dir"],train=False,download=True,transform=transform_test)
     testloader = torch.utils.data.DataLoader(testset, batch_size=CONFIG["batch_size"],shuffle=False, num_workers=CONFIG["num_workers"])
     
-    ############################################################################
-    #   Instantiate model and move to target device
-    ############################################################################
     model = SimpleCNN()   # instantiate your model ### TODO
     model = model.to(CONFIG["device"])   # move it to target device
 
     print("\nModel summary:")
     print(f"{model}\n")
 
-    # The following code you can run once to find the batch size that gives you the fastest throughput.
-    # You only have to do this once for each machine you use, then you can just
-    # set it in CONFIG.
     SEARCH_BATCH_SIZES = True
     if SEARCH_BATCH_SIZES:
         from utils import find_optimal_batch_size
@@ -227,9 +188,6 @@ def main():
         print(f"Using batch size: {CONFIG['batch_size']}")
     
 
-    ############################################################################
-    # Loss Function, Optimizer and optional learning rate scheduler
-    ############################################################################
     criterion = nn.CrossEntropyLoss()   ### TODO -- define loss criterion
     optimizer = optim.Adam(model.parameters(), lr=CONFIG["learning_rate"], weight_decay=5e-4)   ### TODO -- define optimizer
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=2, gamma=0.1)  # Add a scheduler   ### TODO -- you can optionally add a LR scheduler
@@ -239,9 +197,7 @@ def main():
     wandb.init(project="sp25-ds542-challenge", config=CONFIG)
     wandb.watch(model)  # watch the model gradients
 
-    ############################################################################
-    # --- Training Loop (Example - Students need to complete) ---
-    ############################################################################
+    
     best_val_acc = 0.0
 
     for epoch in range(CONFIG["epochs"]):
@@ -267,9 +223,6 @@ def main():
 
     wandb.finish()
 
-    ############################################################################
-    # Evaluation -- shouldn't have to change the following code
-    ############################################################################
     import eval_cifar100
     import eval_ood
 
