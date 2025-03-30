@@ -75,7 +75,7 @@ def main():
         "model": "ResNet_50_CNN",
         "batch_size": 128,
         "learning_rate": 1e-4,#Use 1e-3 for phase 1
-        "epochs": 100,
+        "epochs": 100, #Keep it 10 for Phase 1
         "num_workers": 2,
         "device": "cuda" if torch.cuda.is_available() else "cpu",
         "data_dir": "./data",
