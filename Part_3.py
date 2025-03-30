@@ -74,7 +74,7 @@ def main():
     CONFIG = {
         "model": "ResNet_50_CNN",
         "batch_size": 128,
-        "learning_rate": 1e-4,
+        "learning_rate": 1e-4,#Use 1e-3 for phase 1
         "epochs": 100,
         "num_workers": 2,
         "device": "cuda" if torch.cuda.is_available() else "cpu",
@@ -82,7 +82,7 @@ def main():
         "ood_dir": "./data/ood-test",
         "wandb_project": "Resnet_50_Part_3",
         "phase": 2,
-        "freeze_backbone": False,
+        "freeze_backbone": False,#Freeze the backbone for phase 1
         "seed": 42,
     }
 
