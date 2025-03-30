@@ -13,7 +13,7 @@ import torchvision.models as tv_models
 import json
 import random
 
-################################################################################
+
 def set_seed(seed=42):
     torch.manual_seed(seed)
     np.random.seed(seed)
